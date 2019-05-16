@@ -52,7 +52,7 @@ display(data.head(n=1))
 # 
 # **提示：** 您可能需要查看上面的生成的表，以了解`'income'`条目的格式是什么样的。 
 
-# In[9]:
+# In[2]:
 
 
 # TODO：总的记录数
@@ -65,7 +65,7 @@ n_greater_50k = data[data.income == '>50K'].shape[0]
 n_at_most_50k = data[data.income == '<=50K'].shape[0]
 
 # TODO：被调查者收入大于$50,000所占的比例
-greater_percent = n_greater_50k / n_records
+greater_percent = n_greater_50k * 100 / n_records
 
 # 打印结果
 print ("Total number of records: {}".format(n_records))
@@ -81,7 +81,7 @@ print ("Percentage of individuals making more than $50,000: {:.2f}%".format(grea
 # ### 获得特征和标签
 # `income` 列是我们需要的标签，记录一个人的年收入是否高于50K。 因此我们应该把他从数据中剥离出来，单独存放。
 
-# In[10]:
+# In[3]:
 
 
 # 将数据切分成特征和对应的标签
@@ -95,7 +95,7 @@ features_raw = data.drop('income', axis = 1)
 # 
 # 运行下面的代码单元以创建一个关于这两个特征的条形图。请注意当前的值的范围和它们是如何分布的。
 
-# In[11]:
+# In[4]:
 
 
 # 可视化 'capital-gain'和'capital-loss' 两个特征
@@ -106,7 +106,7 @@ vs.distribution(features_raw)
 # 
 # 运行下面的代码单元来执行数据的转换和可视化结果。再次，注意值的范围和它们是如何分布的。
 
-# In[12]:
+# In[5]:
 
 
 # 对于倾斜的数据使用Log转换
@@ -122,7 +122,7 @@ vs.distribution(features_raw, transformed = True)
 # 
 # 运行下面的代码单元来规一化每一个数字特征。我们将使用[`sklearn.preprocessing.MinMaxScaler`](http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MinMaxScaler.html)来完成这个任务。
 
-# In[13]:
+# In[6]:
 
 
 from sklearn.preprocessing import MinMaxScaler
@@ -151,14 +151,14 @@ display(features_raw.head(n = 1))
 #  - 将目标标签`'income_raw'`转换成数字项。
 #    - 将"<=50K"转换成`0`；将">50K"转换成`1`。
 
-# In[56]:
+# In[ ]:
 
 
-# cols = list(set([col.split('_')[0] for col in pd.get_dummies(features_raw).columns if col not in features_raw.columns]))
+cols = list(set([col.split('_')[0] for col in pd.get_dummies(features_raw).columns if col not in features_raw.columns]))
 
-# print(cols)
+print(cols)
 
-# cols[2] = 'education_level'
+cols[2] = 'education_level'
 
 print(cols)
 print(features_raw.shape)
@@ -170,7 +170,7 @@ features_raw[cols].head()
 # income_raw.apply(lambda x: 1 if x=='>50K' else 0)
 
 
-# In[58]:
+# In[9]:
 
 
 # TODO：使用pandas.get_dummies()对'features_raw'数据进行独热编码
@@ -192,7 +192,7 @@ print ("{} total features after one-hot encoding.".format(len(encoded)))
 # 
 # 运行下面的代码单元来完成切分。
 
-# In[59]:
+# In[10]:
 
 
 # 导入 train_test_split
@@ -230,13 +230,7 @@ print ("Testing set has {} samples.".format(X_test.shape[0]))
 # *如果我们选择一个无论什么情况都预测被调查者年收入大于 \$50,000 的模型，那么这个模型在**验证集上**的准确率，查准率，查全率和 F-score是多少？*  
 # 
 
-# In[80]:
-
-
-y_val[y_val==1].shape[0] / y_val.shape[0]
-
-
-# In[66]:
+# In[12]:
 
 
 #不能使用scikit-learn，你需要根据公式自己实现相关计算。
@@ -350,7 +344,7 @@ print ("Naive Predictor on validation data: \n     Accuracy score: {:.4f} \n    
 #  - 计算预测训练集的前300个数据点的准确率和F-score。
 #  - 计算预测验证集的准确率和F-score。
 
-# In[81]:
+# In[13]:
 
 
 # TODO：从sklearn中导入两个评价指标 - fbeta_score和accuracy_score
@@ -417,7 +411,7 @@ def train_predict(learner, sample_size, X_train, y_train, X_val, y_val):
 # 
 # **注意：**取决于你选择的算法，下面实现的代码可能需要一些时间来运行！
 
-# In[82]:
+# In[19]:
 
 
 # TODO：从sklearn中导入三个监督学习模型
@@ -427,8 +421,8 @@ from sklearn.svm import SVC
 
 # TODO：初始化三个模型
 clf_A = GaussianNB()
-clf_B = DecisionTreeClassifier()
-clf_C = SVC()
+clf_B = DecisionTreeClassifier(random_state=1)
+clf_C = SVC(random_state=1)
 
 # TODO：计算1%， 10%， 100%的训练数据分别对应多少点
 samples_1 = int(X_train.shape[0] * 0.01)
@@ -480,7 +474,7 @@ vs.evaluate(results, accuracy, fscore)
 # 
 # **注意：** 取决于你选择的参数列表，下面实现的代码可能需要花一些时间运行！
 
-# In[85]:
+# In[15]:
 
 
 # TODO：导入'GridSearchCV', 'make_scorer'和其他一些需要的库
@@ -555,6 +549,8 @@ print ("Final F-score on the validation data: {:.4f}".format(fbeta_score(y_val, 
 # - 特征3: occupation 职业，不同行业市场情况不同，会直接影响到收入
 # - 特征4: workclass 工作类型，不同工作类型，创造的价值不一样，薪资也会收到影响
 # - 特征5: sex 性别，相对而言，男性更容易获得更多工作机会，更容易接受更大挑战，薪资也更高
+# 
+# 排序：capital-gain education_level occupation workclass sex
 
 # ### 练习 - 提取特征重要性
 # 
@@ -565,7 +561,7 @@ print ("Final F-score on the validation data: {:.4f}".format(fbeta_score(y_val, 
 #  - 在整个训练集上训练一个监督学习模型。
 #  - 使用模型中的 `'feature_importances_'`提取特征的重要性。
 
-# In[87]:
+# In[16]:
 
 
 # TODO：导入一个有'feature_importances_'的监督学习模型
@@ -595,7 +591,7 @@ vs.feature_plot(importances, X_train, y_train)
 # 
 # 如果我们只是用可用特征的一个子集的话模型表现会怎么样？通过使用更少的特征来训练，在评价指标的角度来看我们的期望是训练和预测的时间会更少。从上面的可视化来看，我们可以看到前五个最重要的特征贡献了数据中**所有**特征中超过一半的重要性。这提示我们可以尝试去**减小特征空间**，简化模型需要学习的信息。下面代码单元将使用你前面发现的优化模型，并**只使用五个最重要的特征**在相同的训练集上训练模型。
 
-# In[88]:
+# In[17]:
 
 
 # 导入克隆模型的功能
@@ -634,7 +630,7 @@ print ("F-score on validation data: {:.4f}".format(fbeta_score(y_val, reduced_pr
 # *使用你最有信心的模型，在测试集上测试，计算出准确率和 F-score。*
 # *简述你选择这个模型的原因，并分析测试结果*
 
-# In[96]:
+# In[18]:
 
 
 #TODO test your model on testing data and report accuracy and F score
